@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityLog extends Model
 {
     protected $fillable = [
+        'user_id',
+        'actor_name',
         'title',
         'description',
         'type',
@@ -20,10 +23,27 @@ class ActivityLog extends Model
         ];
     }
 
-    // Helper statis untuk mencatat log baru dari mana saja (controller, event, dll.)
-    public static function record(string $title, ?string $description = null, string $type = 'info'): self
+    public function user()
     {
+        return $this->belongsTo(User::class);
+    }
+
+    public static function record(
+        string $title,
+        ?string $description = null,
+        string $type = 'info',
+        ?User $actor = null
+    ): self {
+        /** @var User|null $user */
+        $user = $actor ?? Auth::user();
+
+        $actorLabel = $user
+            ? ($user->name . (!empty($user->role) ? " ({$user->role})" : ''))
+            : 'Sistem';
+
         return self::create([
+            'user_id' => $user?->id,
+            'actor_name' => $actorLabel,
             'title' => $title,
             'description' => $description,
             'type' => $type,

@@ -109,6 +109,10 @@
                                             'warning' => 'bg-amber-500',
                                             default => 'bg-indigo-500',
                                         };
+                                        $actorName = $log->actor_name
+                                            ?? $log->user?->name
+                                            ?? 'Sistem';
+                                        $actorRole = $log->user?->role ?? null;
                                     @endphp
                                     <button
                                         type="button"
@@ -126,7 +130,13 @@
                                             @if ($log->description)
                                                 <p class="text-[11px] text-slate-500 mt-0.5 truncate">{{ $log->description }}</p>
                                             @endif
-                                            <p class="text-[10px] text-slate-400 mt-1">{{ $log->created_at->diffForHumans() }}</p>
+                                            <div class="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[10px] text-slate-400 mt-1">
+                                                <span class="font-medium text-slate-600">
+                                                    Oleh: {{ $actorName }}@if($actorRole && !str_contains($actorName, "($actorRole)")) ({{ $actorRole }})@endif
+                                                </span>
+                                                <span>&bull;</span>
+                                                <span>{{ $log->created_at?->diffForHumans() }}</span>
+                                            </div>
                                         </div>
                                         @if (!$log->is_read)
                                             <span class="notif-unread-dot w-2 h-2 rounded-full bg-rose-500 shrink-0 mt-1.5"></span>

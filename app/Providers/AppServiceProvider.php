@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('layouts.app', function ($view) {
             $unreadCount = ActivityLog::where('is_read', false)->count();
-            $recentLogs = ActivityLog::latest()->take(8)->get();
+            $recentLogs = ActivityLog::with('user')->latest()->take(8)->get();
 
             $view->with([
                 'unreadNotificationCount' => $unreadCount,
